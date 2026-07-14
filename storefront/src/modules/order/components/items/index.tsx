@@ -1,0 +1,40 @@
+import repeat from "@lib/util/repeat"
+import { sortByCreatedAtDesc } from "@lib/util/line-item"
+import { HttpTypes } from "@medusajs/types"
+import { Divider, Table } from "@modules/common/components/ui"
+
+import Item from "@modules/order/components/item"
+import SkeletonLineItem from "@modules/skeletons/components/skeleton-line-item"
+
+type ItemsProps = {
+  order: HttpTypes.StoreOrder
+}
+
+const Items = ({ order }: ItemsProps) => {
+  const items = order.items
+
+  return (
+    <div className="flex flex-col">
+      <Divider className="!mb-0" />
+      <Table>
+        <Table.Body data-testid="products-table">
+          {items?.length
+            ? sortByCreatedAtDesc(items).map((item) => {
+                return (
+                  <Item
+                    key={item.id}
+                    item={item}
+                    currencyCode={order.currency_code}
+                  />
+                )
+              })
+            : repeat(5).map((i) => {
+                return <SkeletonLineItem key={i} />
+              })}
+        </Table.Body>
+      </Table>
+    </div>
+  )
+}
+
+export default Items

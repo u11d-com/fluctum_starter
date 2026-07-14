@@ -1,0 +1,156 @@
+"use client"
+
+import { useTranslations } from 'next-intl'
+import { Listbox, Transition } from "@headlessui/react"
+import { ChevronUpDown } from "@medusajs/icons"
+import { ChoiceCard, Radio, Text, clx } from "@modules/common/components/ui"
+import { Fragment, useMemo } from "react"
+
+import compareAddresses from "@lib/util/compare-addresses"
+import { HttpTypes } from "@medusajs/types"
+
+export type AddressFields = Pick<
+  HttpTypes.StoreCartAddress,
+  | "first_name"
+  | "last_name"
+  | "phone"
+  | "company"
+  | "address_1"
+  | "address_2"
+  | "city"
+  | "country_code"
+  | "province"
+  | "postal_code"
+>
+
+function toStoreCartAddress(
+  address: HttpTypes.StoreCustomerAddress
+): AddressFields {
+  return {
+    first_name: address.first_name ?? "",
+    last_name: address.last_name ?? "",
+    phone: address.phone ?? "",
+    company: address.company ?? "",
+    address_1: address.address_1 ?? "",
+    address_2: address.address_2 ?? "",
+    city: address.city ?? "",
+    country_code: address.country_code ?? "",
+    province: address.province ?? "",
+    postal_code: address.postal_code ?? "",
+  }
+}
+
+type AddressSelectProps = {
+  addresses: HttpTypes.StoreCustomerAddress[]
+  addressInput: AddressFields | null
+  onSelect: (
+    address: AddressFields | undefined,
+    email?: string
+  ) => void
+}
+
+const AddressSelect = ({
+  addresses,
+  addressInput,
+  onSelect,
+}: AddressSelectProps) => {
+  const t = useTranslations('checkout')
+
+  const handleSelect = (id: string) => {
+    const savedAddress = addresses.find((a) => a.id === id)
+    if (savedAddress) {
+      onSelect(toStoreCartAddress(savedAddress))
+    }
+  }
+
+  const selectedAddress = useMemo(() => {
+    return addresses.find((a) => addressInput && compareAddresses(a, addressInput))
+  }, [addresses, addressInput])
+
+  return (
+    <Listbox onChange={handleSelect} value={selectedAddress?.id}>
+      <div className="relative">
+        <Listbox.Button
+          className="relative w-full flex justify-between items-center px-4 py-[10px] text-left bg-ui-bg-base cursor-default border rounded-rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-gray-300 focus-visible:ring-offset-2 focus-visible:border-gray-300 text-base-regular"
+          data-testid="shipping-address-select"
+        >
+          {({ open }) => (
+            <>
+              <Text as="span" className="block truncate">
+                  {selectedAddress
+                    ? selectedAddress.address_1
+                    : t('chooseAddress')}
+              </Text>
+              <ChevronUpDown
+                className={clx("transition-rotate duration-200", {
+                  "transform rotate-180": open,
+                })}
+              />
+            </>
+          )}
+        </Listbox.Button>
+        <Transition
+          as={Fragment}
+          leave="transition ease-in duration-100"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <Listbox.Options
+            className="absolute z-20 w-full overflow-auto text-small-regular bg-ui-bg-base border border-top-0 max-h-60 focus-visible:outline-none sm:text-sm"
+            data-testid="shipping-address-options"
+          >
+            {addresses.map((address) => {
+              return (
+                <Listbox.Option
+                  key={address.id}
+                  value={address.id}
+                  className="cursor-default select-none relative"
+                  data-testid="shipping-address-option"
+                >
+                  <ChoiceCard
+                    selected={selectedAddress?.id === address.id}
+                    className="pl-6 pr-10 py-4"
+                  >
+                    <div className="flex gap-x-4 items-start">
+                      <Radio
+                        checked={selectedAddress?.id === address.id}
+                        data-testid="shipping-address-radio"
+                      />
+                      <div className="flex flex-col">
+                        <Text as="span" className="text-left text-base-semi">
+                          {address.first_name} {address.last_name}
+                        </Text>
+                        {address.company && (
+                          <Text as="span">
+                            {address.company}
+                          </Text>
+                        )}
+                        <div className="flex flex-col text-left mt-2">
+                          <Text as="span">
+                            {address.address_1}
+                            {address.address_2 && (
+                              <Text as="span">, {address.address_2}</Text>
+                            )}
+                          </Text>
+                          <Text as="span">
+                            {address.postal_code}, {address.city}
+                          </Text>
+                          <Text as="span">
+                            {address.province && `${address.province}, `}
+                            {address.country_code?.toUpperCase()}
+                          </Text>
+                        </div>
+                      </div>
+                    </div>
+                  </ChoiceCard>
+                </Listbox.Option>
+              )
+            })}
+          </Listbox.Options>
+        </Transition>
+      </div>
+    </Listbox>
+  )
+}
+
+export default AddressSelect
