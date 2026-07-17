@@ -5,18 +5,16 @@
   "engines": {
     "node": ">=24"
   },
-  "workspaces": [
-    "backend",
-    "storefront"
-  ],
+  "packageManager": "pnpm@11.13.1",
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
-    "test": "turbo test"
+    "test": "turbo test",
+    "backend:migrate": "pnpm --filter @u11d/medusa-dynamic-pricing-backend run migrate",
+    "backend:create-admin": "pnpm --filter @u11d/medusa-dynamic-pricing-backend run create-admin"
   },
   "devDependencies": {
     "turbo": "^2"
-  },
-  "packageManager": "npm@11.6.2"
+  }
 }
