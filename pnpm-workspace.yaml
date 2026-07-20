@@ -25,3 +25,5 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   workerd: true
+minimumReleaseAgeExclude:
+  - '@u11d/medusa-dynamic-pricing@0.1.1'
