@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:17.10-alpine
-    container_name: fluctum-postgres
+    container_name: dynamic-pricing-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
@@ -19,7 +19,7 @@ services:
 
   redis:
     image: redis:8.6-alpine
-    container_name: fluctum-redis
+    container_name: dynamic-pricing-redis
     restart: unless-stopped
     ports:
       - "6379:6379"
