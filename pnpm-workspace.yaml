@@ -26,4 +26,4 @@ allowBuilds:
   unrs-resolver: true
   workerd: true
 minimumReleaseAgeExclude:
-  - '@u11d/medusa-dynamic-pricing@0.1.2'
+  - '@u11d/medusa-dynamic-pricing@0.2.0'
