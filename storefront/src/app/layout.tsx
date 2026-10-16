@@ -22,14 +22,21 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const locale = await getLocale()
   const messages = await getMessages()
   return (
-    <html lang={locale} className={`${lato.variable}`}>
+    // `data-scroll-behavior` lets Next.js turn off the global smooth scrolling
+    // during route changes, so new pages open at the top instead of mid-animation.
+    <html
+      lang={locale}
+      className={`${lato.variable}`}
+      data-scroll-behavior="smooth"
+    >
       <head>
         <link rel="icon" href="/fluctum-logo-full.svg" type="image/svg+xml" />
+        <link rel="ucp" href="/.well-known/ucp" />
       </head>
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <SpotPriceProvider>
-            <main className="relative">{props.children}</main>
+            {props.children}
           </SpotPriceProvider>
           <Toaster
             position="bottom-right"
